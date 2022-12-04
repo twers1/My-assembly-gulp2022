@@ -12,7 +12,7 @@ const cssnano = require('gulp-cssnano') // метод cssnano делает ум�
 const uglify = require('gulp-uglify') // метод uglify делаетт уменьшенный js файл, т.е работает как cssnano
 const plumber = require('gulp-plumber') // метод plumber предотвращает ошибки 
 const panini = require('panini')
-const imagemin = require('gulp-imagemin')
+const imagemin = require('gulp-imagemin') // метод imagemin сжимает картинки
 const rigger = require('gulp-rigger') // метод rigger собирает все файлы js воедино 
 const browserSync = require('browser-sync').create()
 
@@ -27,7 +27,7 @@ const path = {
         html: distPath, // build - то, что будет получаться у нас на выходе (там, где все сжато)
         css: distPath + 'assets/css/',
         js: distPath + 'assets/js/',
-        iamges: distPath + 'assets/images/',
+        images: distPath + 'assets/images/',
         fonts: distPath + 'assets/fonts/'
 
     },
@@ -42,8 +42,8 @@ const path = {
         html: srcPath + '**/*.html',
         js: srcPath + 'assets/js/**/*.js',
         css: srcPath + 'assets/scss/**/*.',
-        images: srcPath + 'assets/scss/**/*.{jpg, png, svg}',
-        fonts: srcPath + 'assets/fonts/**/*.{eot, ttf, svg}'
+        images: srcPath + 'assets/scss/**/*.{jpg,png,svg}',
+        fonts: srcPath + 'assets/fonts/**/*.{eot,ttf,svg}'
     },
     clean: './' + distPath // clean нужен для того, чтобы очищать папку dist 
 }
@@ -96,8 +96,14 @@ function js(){
 }
 
 // Task Image
+function images() {
+    return src(path.src.images, { base: srcPath + 'assects/images/'}) 
+        .pipe(imagemin())
+        .pipe(dest(path.build.images))
+}
 
 // Для каждой функции нужно прописывать exports, чтобы все заработало 
 exports.html = html 
 exports.css = css 
 exports.js = js
+exports.images = images
