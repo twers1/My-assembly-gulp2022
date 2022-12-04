@@ -5,15 +5,17 @@ const gulp = require('gulp')
 const sass = require('gulp-sass')(require('sass'))
 const del = require('del')
 const autoprefixer = require('gulp-autoprefixer')
-const cssbeautify = require('gulp-cssbeautify')
-const removeComments = require('gulp-strip-css-comments')
-const rename = require('gulp-rename')
-const cssnano = require('gulp-cssnano')
-const uglify = require('gulp-uglify')
-const plumber = require('gulp-plumber')
+const cssbeautify = require('gulp-cssbeautify') // метод cssbeautify делает css красивей
+const removeComments = require('gulp-strip-css-comments') // метод removeComments удаляет комментарии
+const rename = require('gulp-rename') // метод rename переменовывает файлы, чтобы отличать минифицированный и неминифицированный 
+const cssnano = require('gulp-cssnano') // метод cssnano делает уменьшенный css файл 
+const uglify = require('gulp-uglify') // метод uglify делаетт уменьшенный js файл, т.е работает как cssnano
+const plumber = require('gulp-plumber') // метод plumber предотвращает ошибки 
 const panini = require('panini')
 const imagemin = require('gulp-imagemin')
+const rigger = require('gulp-rigger') // метод rigger собирает все файлы js воедино 
 const browserSync = require('browser-sync').create()
+
 
 /* Paths (Пути) */
 
@@ -46,9 +48,56 @@ const path = {
     clean: './' + distPath // clean нужен для того, чтобы очищать папку dist 
 }
 
+/* Tasks */
+
+
+// Task HTML
 function html() {
     return src(path.src.html, { base: srcPath }) // добавляем base, он нужен для того, чтобы если у нас будут проекты огромные и он выведет ошибку в path.src.html, то base все исправит
+        .pipe(plumber())
         .pipe(dest(path.build.html)) // метод pipe выполняют какую-либо задачу 
 }
 
-exports.html = html // для каждой функции нужно прописывать exports, чтобы все заработало 
+// Task CSS
+function css() {
+    return src(path.src.css, { base: srcPath + 'assects/scss/'}) 
+        .pipe(plumber())
+        .pipe(sass()) // компилируем css файлы в scss
+        .pipe(autoprefixer()) // проставляет префиксы
+        .pipe(cssbeautify())
+        .pipe(dest(path.build.css))
+        .pipe(cssnano({
+            zindex: false, // метод cssnano кроме сокращения файла использует zindex для того, чтобы регулировать отображения ↓
+            discardComments: { //  по верх чего-то, и из-за этого может сломаться ваша верстка, поэтому лучше отключать данную фукнцию 
+                removeAll: true // discardComments позволяет убирать все комментарии в минифицированном файле 
+            }
+        }))
+        .pipe(removeComments())
+        .pipe(rename({
+            suffix: '.min', // суффикс, который будет после отображать минифицированный файл 
+            extname: '.css' // extname - расширение файла
+
+        }))
+        .pipe(dest(path.build.css))
+}
+
+// Task JS 
+function js(){
+    return src(path.src.js, { base: srcPath + 'assects/js/'}) 
+        .pipe(plumber())
+        .pipe(rigger())
+        .pipe(dest(path.build.js))
+        .pipe(uglify())
+        .pipe(rename({
+            suffix: '.min',
+            extname: '.js'
+        }))
+        .pipe(dest(path.build.js))
+}
+
+// Task Image
+
+// Для каждой функции нужно прописывать exports, чтобы все заработало 
+exports.html = html 
+exports.css = css 
+exports.js = js
