@@ -3,7 +3,7 @@
 const {src, dest} = require('gulp') // dest нужна для того, чтобы записать этот файл в папку dest
 const gulp = require('gulp')
 const sass = require('gulp-sass')(require('sass'))
-const del = require('del')
+const del = require('del') // метод del очищает файлы(удаляет)
 const autoprefixer = require('gulp-autoprefixer')
 const cssbeautify = require('gulp-cssbeautify') // метод cssbeautify делает css красивей
 const removeComments = require('gulp-strip-css-comments') // метод removeComments удаляет комментарии
@@ -102,8 +102,14 @@ function images() {
         .pipe(dest(path.build.images))
 }
 
+// Очистка всех файлов
+function clean() {
+    return del(path.clean)
+}
+
 // Для каждой функции нужно прописывать exports, чтобы все заработало 
 exports.html = html 
 exports.css = css 
 exports.js = js
 exports.images = images
+exports.clean = clean
