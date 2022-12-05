@@ -50,6 +50,14 @@ const path = {
 
 /* Tasks */
 
+// Task for servers
+function serve() {
+    browserSync.init({
+        server: {
+            baseDir: "./" + distPath
+        }
+    });
+}
 
 // Task HTML
 function html() {
@@ -112,6 +120,19 @@ function fonts() {
     return src(path.src.fonts, { base: srcPath + 'assects/fonts/'})
 }
 
+// Task for watch
+function watchFiles() {
+    gulp.watch([path.watch.html], html)
+    gulp.watch([path.watch.css], css)
+    gulp.watch([path.watch.js], js)
+    gulp.watch([path.watch.images], images)
+    gulp.watch([path.fonts.js], fonts)
+}
+
+// Настройка build и watch(чтобы все запускалось по очереди)
+const build = gulp.series(clean, gulp.parallel(html, css, js, images, fonts)) // parallel - делает одновременно все действия, series - запускает по очереди 
+const watch = gulp.parallel(build, watchFiles)
+
 // Для каждой функции нужно прописывать exports, чтобы все заработало 
 exports.html = html 
 exports.css = css 
@@ -119,3 +140,5 @@ exports.js = js
 exports.images = images
 exports.clean = clean
 exports.fonts = fonts
+exports.build = build 
+exports.watch = watch
