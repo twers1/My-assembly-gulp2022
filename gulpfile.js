@@ -102,9 +102,14 @@ function images() {
         .pipe(dest(path.build.images))
 }
 
-// Очистка всех файлов
+// Task Очистка всех файлов
 function clean() {
     return del(path.clean)
+}
+
+// Task fonts 
+function fonts() {
+    return src(path.src.fonts, { base: srcPath + 'assects/fonts/'})
 }
 
 // Для каждой функции нужно прописывать exports, чтобы все заработало 
@@ -113,3 +118,4 @@ exports.css = css
 exports.js = js
 exports.images = images
 exports.clean = clean
+exports.fonts = fonts
