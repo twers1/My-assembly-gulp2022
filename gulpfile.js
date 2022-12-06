@@ -64,6 +64,7 @@ function html() {
     return src(path.src.html, { base: srcPath }) // добавляем base, он нужен для того, чтобы если у нас будут проекты огромные и он выведет ошибку в path.src.html, то base все исправит
         .pipe(plumber())
         .pipe(dest(path.build.html)) // метод pipe выполняют какую-либо задачу 
+        .pipe(browserSync.reload({stream: true})) // перезапускает сервер; stream:true - браузер работает
 }
 
 // Task CSS
@@ -87,6 +88,7 @@ function css() {
 
         }))
         .pipe(dest(path.build.css))
+        .pipe(browserSync.reload({stream: true}))
 }
 
 // Task JS 
@@ -101,6 +103,7 @@ function js(){
             extname: '.js'
         }))
         .pipe(dest(path.build.js))
+        .pipe(browserSync.reload({stream: true}))
 }
 
 // Task Image
@@ -108,6 +111,7 @@ function images() {
     return src(path.src.images, { base: srcPath + 'assects/images/'}) 
         .pipe(imagemin())
         .pipe(dest(path.build.images))
+        .pipe(browserSync.reload({stream: true}))
 }
 
 // Task Очистка всех файлов
@@ -118,6 +122,7 @@ function clean() {
 // Task fonts 
 function fonts() {
     return src(path.src.fonts, { base: srcPath + 'assects/fonts/'})
+    .pipe(browserSync.reload({stream: true}))
 }
 
 // Task for watch
@@ -131,7 +136,7 @@ function watchFiles() {
 
 // Настройка build и watch(чтобы все запускалось по очереди)
 const build = gulp.series(clean, gulp.parallel(html, css, js, images, fonts)) // parallel - делает одновременно все действия, series - запускает по очереди 
-const watch = gulp.parallel(build, watchFiles)
+const watch = gulp.parallel(build, watchFiles, serve)
 
 // Для каждой функции нужно прописывать exports, чтобы все заработало 
 exports.html = html 
@@ -142,3 +147,4 @@ exports.clean = clean
 exports.fonts = fonts
 exports.build = build 
 exports.watch = watch
+exports.default = watch
